@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Annuaire</title>
+    </head>
+    <body>
+        <h1>Annuaire</h1>
+
+    
+        <div >
+            <input type="text" id="donnee">
+            <input type="submit" id="chercher" value="Chercher">
+            <input type="submit" id="tout" value="Tout">
+        </div>
+        <div id='result'></div>
+        
+        <script>
+            function display(data) {
+                //selectionner la div de resultat
+                const div = document.getElementById('result');
+                //effacer son contenu
+                div.replaceChildren();
+                //@PourChaque element @Dans data
+                for (const element of data)
+                //@debutBloc
+                {
+                    //creer une div 
+                    const row = document.createElement('div');
+                    //changer le contenu de cette div avec Object.values(element).join(' - ')
+                    row.innerHTML = Object.values(element).join(' - ');
+                    //rattacher la div cree à la div resultat
+                    div.appendChild(row); 
+                //@FinBloc
+                }
+            }
+
+            function handleList() {
+                fetch('http://localhost:4000')
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    display(data);
+                });
+            }
+            
+            function reinit() {
+                //vider le champ
+                document.getElementById('donnee').value = "";
+            }
+
+            //Modifier la fonction handleSearch pr appeler le service search
+            //sur l'endpoint : POST http://localhost:3000/search
+            //en envoyant une donnée "text" avec comme valeur ce que l'utilisateur a entré dans l'input.
+            //Afficher les resultats provenant du service.
+
+            function handleSearch() {
+                //.value permet de recup la valeur
+                var input = document.getElementById('donnee').value;
+                fetch('http://localhost:4000/search', { 
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body:JSON.stringify({text:input}),
+                }) 
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                display(data);
+                })
+
+                //reinit();
+            }
+
+            const tout = document.getElementById('tout');
+            tout.addEventListener('click', handleList);
+
+            const chercher = document.getElementById('chercher');
+            chercher.addEventListener('click', handleSearch)
+        </script>
+
+        <!-- <script src ="/backJs/index.js"></script> -->
+    </body>
+</html>
